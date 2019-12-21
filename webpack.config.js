@@ -5,7 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: {
-    "vue-shapes": './src/Shapes.js'
+    "vue-shapes": './src/VueShapes.js',
+    "app": './src/App.js'
   },
   output: {
     globalObject: 'self',
@@ -64,8 +65,8 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      chunks: ['editor'],
-      template: './src/Shapes.ejs',
+      chunks: ['app'],
+      template: './src/App.ejs',
       inject: 'body',
       filename: 'index.html'
     })
