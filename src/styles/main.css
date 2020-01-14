@@ -1,0 +1,26 @@
+.vue-shapes-h100 {
+  height: 100%;
+}
+.vue-shapes-w100 {
+  width: 100%;
+}
+.vue-shapes-svg {
+  background-image: url("../images/background.png");
+}
+.vue-shapes-button {
+  width: 26px;
+  height: 26px;
+  border: 0px solid transparent;
+}
+.vue-shapes-scale .fit-button {
+  background-image: url("../images/fit-screen.svg");
+  background-size: cover;
+}
+.vue-shapes-scale .plus-button {
+  background-image: url("../images/plus.svg");
+  background-size: cover;
+}
+.vue-shapes-scale .minus-button {
+  background-image: url("../images/minus.svg");
+  background-size: cover;
+}

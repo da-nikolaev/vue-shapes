@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: {
     "vue-shapes": './src/VueShapes.js',
-    "app": './src/App.js'
+    "demo": './src/demo/App.js'
   },
   output: {
     globalObject: 'self',
@@ -50,7 +50,7 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
+        test: /\.(eot|woff|woff2|svg|ttf|png)([\?]?.*)$/,
         loader: "file-loader"
       }
     ]
@@ -65,8 +65,8 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      chunks: ['app'],
-      template: './src/App.ejs',
+      chunks: ['demo'],
+      template: './src/demo/App.ejs',
       inject: 'body',
       filename: 'index.html'
     })

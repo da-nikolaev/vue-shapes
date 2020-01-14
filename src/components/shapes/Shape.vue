@@ -4,31 +4,24 @@ export default {
   props: ["data"],
   data: function() {
     return {
-      meta: {
-        dragX: 0,
-        dragY: 0,
-        dragWidth: 0,
-        dragHeight: 0,
-        selected: false,
-        resizable: false
-      }
+      slots: []
     };
   },
   methods: {
-    intersect: function(pos) {
-      return false;
+    getId: function() {
+      return this.data.id;
     },
-    intersectRect: function(point, rect) {
-      if (
-        point.x >= rect.left &&
-        point.y >= rect.top &&
-        point.x <= rect.right &&
-        point.y <= rect.bottom
-      ) {
-        return true;
+    addSlot: function(slot) {
+      if (!this.data.slots) {
+        this.data.slots = []
       }
-      return false;
+      this.data.slots.push(slot);
+    },
+    getSlots: function() {
+      return this.data.slots;
     }
   }
 };
 </script>
+<style scoped>
+</style>
