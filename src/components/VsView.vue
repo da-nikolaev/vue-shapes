@@ -1,17 +1,20 @@
 <template>
-  <svg class="vue-shapes-h100 vue-shapes-w100 vue-shapes-svg">
-    <component
-      v-for="node in nodes"
-      v-bind:is="node.group"
-      v-bind:key="node.id"
-      v-bind:data="node"
-      :ref="node.id"
-    />
-    <vue-shapes-path v-for="edge in computedEdges" v-bind:key="edge.id" v-bind:data="edge" />
-  </svg>
+  <div class="vue-shapes-h100 vue-shapes-w100">
+    <svg class="vue-shapes-h100 vue-shapes-w100 vue-shapes-svg">
+      <component
+        v-for="node in nodes"
+        v-bind:is="node.group"
+        v-bind:key="node.id"
+        v-bind:data="node"
+        :ref="node.id"
+      />
+      <vue-shapes-path v-for="edge in computedEdges" v-bind:key="edge.id" v-bind:data="edge" />
+    </svg>
+    <VsScale />
+  </div>
 </template>
 <script>
-import "../styles/main.css";
+import VsScale from "./VsScale";
 import Path from "./shapes/Path";
 
 export default {
@@ -25,7 +28,7 @@ export default {
   },
   mounted: function() {
     this.$nextTick(() => {
-      var svg = this.$el;
+      var svg = this.$el.firstElementChild;
 
       svg.addEventListener("mousedown", e => this.startDrag(e));
       svg.addEventListener("mousemove", e => this.drag(e));
@@ -41,7 +44,7 @@ export default {
   },
   methods: {
     getMousePosition: function(evt) {
-      let CTM = this.$el.getScreenCTM();
+      let CTM = this.$el.firstElementChild.getScreenCTM();
 
       if (evt.touches) {
         evt = evt.touches[0];
@@ -70,17 +73,17 @@ export default {
         }
       }
       if (!translate) {
-        translate = this.$el.createSVGTransform();
+        translate = this.$el.firstElementChild.createSVGTransform();
         translate.setTranslate(0, 0);
         transforms.insertItemBefore(translate, 0);
       }
       if (!scale) {
-        scale = this.$el.createSVGTransform();
+        scale = this.$el.firstElementChild.createSVGTransform();
         scale.setScale(1.0, 1.0);
         transforms.insertItemBefore(scale, 0);
       }
       if (!matrix) {
-        matrix = this.$el.createSVGTransform();
+        matrix = this.$el.firstElementChild.createSVGTransform();
         transforms.insertItemBefore(matrix, 0);
       }
 
@@ -117,9 +120,9 @@ export default {
       this.dragging = [];
       if (evt.target.getAttribute("draggable")) {
         this.dragging.push(createDragging(evt.target));
-      } else if (evt.target == this.$el) {
-        for (let i = 0; i < this.$el.children.length; i++) {
-          const child = this.$el.children.item(i);
+      } else if (evt.target == this.$el.firstElementChild) {
+        for (let i = 0; i < this.$el.firstElementChild.children.length; i++) {
+          const child = this.$el.firstElementChild.children.item(i);
           this.dragging.push(createDragging(child));
         }
       }
@@ -179,256 +182,448 @@ export default {
             add(
               this.$refs["1"][0].getSlots()[0],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[0],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[0],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[1],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[0],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[2],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[0],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[3],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[1],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[0],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[1],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[1],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[1],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[2],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[1],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[3],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[2],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[0],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[2],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[1],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[2],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[2],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[2],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[3],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[3],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[0],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[3],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[1],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[3],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[2],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ],
           [
             add(
               this.$refs["1"][0].getSlots()[3],
               this.$refs["1"][0].data.x +
-                parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["1"][0].data.y +
-                parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             ),
             add(
               this.$refs["2"][0].getSlots()[3],
               this.$refs["2"][0].data.x +
-                parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0),
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") ||
+                    0
+                ),
               this.$refs["2"][0].data.y +
-                parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0)
+                parseInt(
+                  this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") ||
+                    0
+                )
             )
           ]
         ]);
@@ -437,35 +632,51 @@ export default {
         let slot2 = slots.slot2;
         this.computedEdges[0].x1 =
           this.$refs["1"][0].data.x +
-          parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0) +
+          parseInt(
+            this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") || 0
+          ) +
           slot1.x1;
         this.computedEdges[0].y1 =
           this.$refs["1"][0].data.y +
-          parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0) +
+          parseInt(
+            this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") || 0
+          ) +
           slot1.y1;
         this.computedEdges[0].x2 =
           this.$refs["1"][0].data.x +
-          parseInt(this.$refs["1"][0].$el.getAttribute("tx") || 0) +
+          parseInt(
+            this.$refs["1"][0].$el.firstElementChild.getAttribute("tx") || 0
+          ) +
           slot1.x2;
         this.computedEdges[0].y2 =
           this.$refs["1"][0].data.y +
-          parseInt(this.$refs["1"][0].$el.getAttribute("ty") || 0) +
+          parseInt(
+            this.$refs["1"][0].$el.firstElementChild.getAttribute("ty") || 0
+          ) +
           slot1.y2;
         this.computedEdges[0].x3 =
           this.$refs["2"][0].data.x +
-          parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0) +
+          parseInt(
+            this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") || 0
+          ) +
           slot2.x2;
         this.computedEdges[0].y3 =
           this.$refs["2"][0].data.y +
-          parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0) +
+          parseInt(
+            this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") || 0
+          ) +
           slot2.y2;
         this.computedEdges[0].x4 =
           this.$refs["2"][0].data.x +
-          parseInt(this.$refs["2"][0].$el.getAttribute("tx") || 0) +
+          parseInt(
+            this.$refs["2"][0].$el.firstElementChild.getAttribute("tx") || 0
+          ) +
           slot2.x1;
         this.computedEdges[0].y4 =
           this.$refs["2"][0].data.y +
-          parseInt(this.$refs["2"][0].$el.getAttribute("ty") || 0) +
+          parseInt(
+            this.$refs["2"][0].$el.firstElementChild.getAttribute("ty") || 0
+          ) +
           slot2.y1;
       });
     },
@@ -495,8 +706,8 @@ export default {
     },
     zoomFit: function() {},
     updateScale: function(pos) {
-      for (let i = 0; i < this.$el.children.length; i++) {
-        const child = this.$el.children.item(i);
+      for (let i = 0; i < this.$el.firstElementChild.children.length; i++) {
+        const child = this.$el.firstElementChild.children.item(i);
         let transforms = child.transform.baseVal;
         let transform = this.getOrCreateTransformation(
           transforms,
@@ -515,9 +726,19 @@ export default {
     }
   },
   components: {
-    "vue-shapes-path": Path
+    "vue-shapes-path": Path,
+    VsScale
   }
 };
 </script>
 <style scoped>
+.vue-shapes-h100 {
+  height: 100%;
+}
+.vue-shapes-w100 {
+  width: 100%;
+}
+.vue-shapes-svg {
+  background-image: url("../images/background.png");
+}
 </style>

@@ -1,20 +1,19 @@
 <template>
   <div class="h100 w100">
-    <vue-shapes-view ref="view" v-bind:nodes="nodes" v-bind:edges="edges"></vue-shapes-view>
-    <vue-shapes-scale class="right" v-on:zoomIn="zoomIn()" v-on:zoomOut="zoomOut()" v-on:zoomFit="zoomFit()"></vue-shapes-scale>
+    <VsView ref="view" v-bind:nodes="nodes" v-bind:edges="edges"></VsView>
   </div>
 </template>
 <script>
-import Vue from 'vue'
-import { View, Scale } from "../VueShapes";
+import Vue from "vue";
 import Example from "./Example";
+import { VsView } from "../VueShapes";
 
 export default {
   data: function() {
     return {
       nodes: [],
       edges: []
-    }
+    };
   },
   mounted: function() {
     this.$nextTick(() => {
@@ -23,9 +22,7 @@ export default {
         { id: "1", group: "Example", x: 15, y: 10, width: 200, height: 150 },
         { id: "2", group: "Example", x: 250, y: 310, width: 300, height: 150 }
       ]);
-      this.edges = Vue.observable([
-        { from: "1", to: "2" }
-      ]);
+      this.edges = Vue.observable([{ from: "1", to: "2" }]);
     });
   },
   methods: {
@@ -40,8 +37,7 @@ export default {
     }
   },
   components: {
-    "vue-shapes-view": View,
-    "vue-shapes-scale": Scale
+    VsView
   }
 };
 </script>
