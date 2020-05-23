@@ -1,7 +1,7 @@
 <template>
-  <ForeignObject v-bind:data="data">
+  <VsForeignObject v-bind:data="data">
     <div class="example">
-      <br/>
+      <br />
       <div class="row">
         <label>Ответ:</label>
       </div>
@@ -13,37 +13,29 @@
       </div>
       <div class="row">
         <ol>
-          <li v-for="todo in todos" v-bind:key="todo.text">
-            {{ todo.text }}
-          </li>
+          <li v-for="todo in todos" v-bind:key="todo.text">{{ todo.text }}</li>
         </ol>
       </div>
     </div>
-  </ForeignObject>
+  </VsForeignObject>
 </template>
 <script>
-import { Shape, ForeignObject, Slot } from "../VueShapes";
+import { VsForeignObject } from "../VueShapes";
 
 export default {
-  extends: Shape,
   props: ["data"],
   data: function() {
     return {
       todos: []
-    }
-  },
-  mounted: function() {
-    this.$nextTick(() => {
-      // this.addSlot(new Slot("", 10, 10));
-    });
+    };
   },
   methods: {
     add: function() {
-      this.todos.push({text: this.todos.length + 1})
+      this.todos.push({ text: this.todos.length + 1 });
     }
   },
   components: {
-    ForeignObject
+    VsForeignObject
   }
 };
 </script>
@@ -54,7 +46,7 @@ export default {
   background-color: #fff;
   border: 1px solid rgb(192, 197, 207);
   border-radius: 8px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
 }
 .row {
   margin-left: 15px;

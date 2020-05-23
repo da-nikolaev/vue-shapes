@@ -1,6 +1,4 @@
 import VsView from './components/VsView'
-import Shape from './components/shapes/Shape'
-import ForeignObject from './components/shapes/ForeignObject'
-import Slot from './components/shapes/Slot'
+import VsForeignObject from './components/shapes/VsForeignObject'
 
-export { VsView, Shape, ForeignObject, Slot }
+export { VsView, VsForeignObject }

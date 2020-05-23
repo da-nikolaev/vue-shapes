@@ -19,22 +19,11 @@ export default {
     this.$nextTick(() => {
       Vue.component("Example", Example);
       this.nodes = Vue.observable([
-        { id: "1", group: "Example", x: 15, y: 10, width: 200, height: 150 },
-        { id: "2", group: "Example", x: 250, y: 310, width: 300, height: 150 }
+        { id: "1", type: "Example", x: 15, y: 10, width: 200, height: 150 },
+        { id: "2", type: "Example", x: 250, y: 310, width: 300, height: 150 }
       ]);
       this.edges = Vue.observable([{ from: "1", to: "2" }]);
     });
-  },
-  methods: {
-    zoomIn: function() {
-      this.$refs.view.zoomIn();
-    },
-    zoomOut: function() {
-      this.$refs.view.zoomOut();
-    },
-    zoomFit: function() {
-      this.$refs.view.zoomFit();
-    }
   },
   components: {
     VsView
@@ -47,10 +36,5 @@ export default {
 }
 .w100 {
   width: 100%;
-}
-.right {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
 }
 </style>
