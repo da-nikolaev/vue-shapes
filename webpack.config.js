@@ -50,8 +50,12 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.(eot|woff|woff2|svg|ttf|png)([\?]?.*)$/,
+        test: /\.(eot|woff|woff2|ttf|png)([\?]?.*)$/,
         loader: "file-loader"
+      },
+      {
+        test: /\.svg$/,
+        use: ['vue-svg-loader'],
       }
     ]
   },
