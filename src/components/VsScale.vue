@@ -1,13 +1,13 @@
 <template>
   <div class="scale">
-    <button class="button" @click="$emit('zoomFit')">
+    <button class="button" @click="emit('zoomFit')">
       <FitScreenSvg />
     </button>
     &nbsp;
-    <button class="button right" @click="$emit('zoomIn')">
+    <button class="button right" @click="emit('zoomIn')">
       <PlusSvg />
     </button>
-    <button class="button right" @click="$emit('zoomOut')">
+    <button class="button right" @click="emit('zoomOut')">
       <MinusSvg />
     </button>
   </div>
@@ -16,11 +16,17 @@
 import FitScreenSvg from "../images/fit-screen.svg";
 import MinusSvg from "../images/minus.svg";
 import PlusSvg from "../images/plus.svg";
+import { EventBus } from "./EventBus";
 export default {
   components: {
     FitScreenSvg,
     MinusSvg,
     PlusSvg
+  },
+  methods: {
+    emit: function(event) {
+      EventBus.$emit(event);
+    }
   }
 };
 </script>

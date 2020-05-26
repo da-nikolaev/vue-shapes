@@ -7,6 +7,8 @@
 </template>
 <script>
 import VsTransformManager from "./VsTransformManager";
+import { EventBus } from "./EventBus";
+import { animate, cube } from "./Animation";
 
 export default {
   data: function() {
@@ -33,7 +35,32 @@ export default {
           };
           this.$emit("nodeDragged", p);
         });
+
+      EventBus.$on("zoomIn", () => this.zoomIn());
+      EventBus.$on("zoomOut", () => this.zoomOut());
+      EventBus.$on("zoomFit", () => this.zoomFit());
     });
+  },
+  methods: {
+    animateZoom: function(delta) {
+      let evt = {
+        clientX: window.innerWidth / 2,
+        clientY: window.innerHeight / 2,
+        wheelDelta: delta
+      };
+      animate({
+        timing: cube,
+        draw: e => this.transformManager.zoom(evt),
+        duration: 300
+      });
+    },
+    zoomIn: function() {
+      this.animateZoom(15);
+    },
+    zoomOut: function() {
+      this.animateZoom(-15);
+    },
+    zoomFit: function() {}
   }
 };
 </script>
