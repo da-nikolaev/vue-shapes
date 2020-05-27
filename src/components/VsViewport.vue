@@ -8,7 +8,7 @@
 <script>
 import VsTransformManager from "./VsTransformManager";
 import { EventBus } from "./EventBus";
-import { animate, cube } from "./Animation";
+import { animate, linear } from "./Animation";
 
 export default {
   data: function() {
@@ -42,23 +42,25 @@ export default {
     });
   },
   methods: {
-    animateZoom: function(delta) {
+    animateZoom: function(sign) {
       let evt = {
         clientX: window.innerWidth / 2,
-        clientY: window.innerHeight / 2,
-        wheelDelta: delta
+        clientY: window.innerHeight / 2
       };
       animate({
-        timing: cube,
-        draw: e => this.transformManager.zoom(evt),
+        timing: linear,
+        draw: t =>
+          this.transformManager.zoom(
+            Object.assign(evt, { wheelDelta: t * sign * 50 })
+          ),
         duration: 300
       });
     },
     zoomIn: function() {
-      this.animateZoom(15);
+      this.animateZoom(1);
     },
     zoomOut: function() {
-      this.animateZoom(-15);
+      this.animateZoom(-1);
     },
     zoomFit: function() {}
   }
