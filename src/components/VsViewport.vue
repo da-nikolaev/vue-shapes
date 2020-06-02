@@ -62,7 +62,9 @@ export default {
     zoomOut: function() {
       this.animateZoom(-1);
     },
-    zoomFit: function() {}
+    zoomFit: function() {
+      this.transformManager.zoomFit();
+    }
   }
 };
 </script>

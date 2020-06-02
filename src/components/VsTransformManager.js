@@ -137,4 +137,23 @@ export default class VsTransformManager {
       this.onZoomHandler(this.viewport, m.a)
     }
   }
+  zoomFit() {
+    let s = this.svg;
+    let g = this.viewport;
+    let gr = g.getBoundingClientRect();
+    let sr = s.getBoundingClientRect();
+
+    let p = this.getEventPoint({ clientX: gr.left, clientY: gr.top }).matrixTransform(g.getCTM().inverse());
+    let z = Math.min(sr.height / (gr.height / g.getCTM().a), sr.width / (gr.width / g.getCTM().a), 1.0);
+
+    this.setCTM(
+      g,
+      this.svg
+        .createSVGMatrix()
+        .translate(-p.x, -p.y)
+        .scale(z)
+        .multiply(g.getCTM().inverse())
+        .multiply(g.getCTM())
+    );
+  }
 }
