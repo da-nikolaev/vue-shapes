@@ -1,6 +1,6 @@
 <template>
   <div class="h100 w100" onwheel>
-    <VsViewport v-on:nodeDragged="this.dragNode">
+    <VsViewport>
       <VsNode v-for="node in this.internalNodes" v-bind:key="node.id" v-bind:data="node" />
       <VsEdge v-for="edge in this.internalEdges" v-bind:key="edge.id" v-bind:data="edge" />
     </VsViewport>
@@ -13,6 +13,7 @@ import VsNode from "./VsNode";
 import VsEdge from "./VsEdge";
 import VsViewport from "./VsViewport";
 import VsScale from "./VsScale";
+import { EventBus } from "./EventBus";
 
 export default {
   props: ["nodes", "edges"],
@@ -27,10 +28,22 @@ export default {
       this.internalNodes = list;
     }
   },
+  mounted: function() {
+    this.$nextTick(() => {
+      EventBus.$on("nodeDragged", this.nodeDragged);
+      EventBus.$on("nodeResized", this.nodeResized);
+    });
+  },
   methods: {
-    dragNode: function({ nodeId, transform }) {
-      let node = this.internalNodes.find(e => e.id == nodeId);
-      Vue.set(node, "transform", transform);
+    getNode: function(nodeId) {
+      return this.internalNodes.find(e => e.id == nodeId);
+    },
+    nodeDragged: function({ nodeId, transform }) {
+      Vue.set(this.getNode(nodeId), "transform", transform);
+    },
+    nodeResized: function({ nodeId, width, height }) {
+      Vue.set(this.getNode(nodeId), "width", width);
+      Vue.set(this.getNode(nodeId), "height", height);
     }
   },
   components: {

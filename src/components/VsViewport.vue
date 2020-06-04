@@ -33,7 +33,7 @@ export default {
             nodeId: e.getAttribute("nodeId"),
             transform: t
           };
-          this.$emit("nodeDragged", p);
+          EventBus.$emit("nodeDragged", p);
         });
 
       EventBus.$on("zoomIn", () => this.zoomIn());
