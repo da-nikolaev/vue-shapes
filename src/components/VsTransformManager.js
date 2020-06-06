@@ -21,16 +21,12 @@ export default class VsTransformManager {
     this.svg.addEventListener("touchcancel", e => this.endDrag(e));
     this.svg.addEventListener("wheel", e => this.zoom(e));
   }
-  onPan(handler) {
-    this.onPanHandler = handler
+  onViewportChanged(handler) {
+    this.onViewportChangedHandler = handler
     return this
   }
   onDrag(handler) {
     this.onDragHandler = handler
-    return this
-  }
-  onZoom(handler) {
-    this.onZoomHandler = handler
     return this
   }
   getEventPoint(evt) {
@@ -44,8 +40,8 @@ export default class VsTransformManager {
     let transform = `matrix(${matrix.a},${matrix.b},${matrix.c},${matrix.d},${matrix.e},${matrix.f})`
 
     if (element == this.viewport) {
-      if (typeof this.onPanHandler === 'function') {
-        this.onPanHandler(element, transform)
+      if (typeof this.onViewportChangedHandler === 'function') {
+        this.onViewportChangedHandler(element, transform)
       }
     }
     else {
@@ -132,10 +128,6 @@ export default class VsTransformManager {
     if (!this.state.transform) this.state.transform = g.getCTM().inverse();
 
     this.state.transform = this.state.transform.multiply(k.inverse());
-
-    if (typeof this.onZoomHandler === 'function') {
-      this.onZoomHandler(this.viewport, m.a)
-    }
   }
   zoomFit() {
     let s = this.svg;

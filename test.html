@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>[vue-shapes]</title>
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="svg" width="1200" height="800">
+    <g id="viewport">
+      <rect x="500" y="200" width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" />
+    </g>
+  </svg>
+  <script>
+    var svg = document.getElementById('svg');
+
+
+    "use strict";
+
+    /// CONFIGURATION
+    /// ====>
+
+    var enablePan = 1; // 1 or 0: enable or disable panning (default enabled)
+    var enableZoom = 1; // 1 or 0: enable or disable zooming (default enabled)
+    var enableDrag = 1; // 1 or 0: enable or disable dragging (default disabled)
+    var zoomScale = 0.4; // Zoom sensitivity
+
+    /// <====
+    /// END OF CONFIGURATION
+
+    var root = svg;
+
+    var state = 'none', svgRoot = null, stateTarget, stateOrigin, stateTf;
+
+    setupHandlers(root);
+
+    /**
+    * Register handlers
+    */
+    function setupHandlers(root) {
+      setAttributes(root, {
+        "onmouseup": "handleMouseUp(evt)",
+        "onmousedown": "handleMouseDown(evt)",
+        "onmousemove": "handleMouseMove(evt)",
+        //"onmouseout" : "handleMouseUp(evt)", // Decomment this to stop the pan functionality when dragging out of the SVG element
+      });
+
+      if (navigator.userAgent.toLowerCase().indexOf('webkit') >= 0)
+        window.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
+      else
+        window.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
+    }
+
+    /**
+    * Retrieves the root element for SVG manipulation. The element is then cached into the svgRoot global variable.
+    */
+    function getRoot(root) {
+      if (svgRoot == null) {
+        var r = root.getElementById("viewport") ? root.getElementById("viewport") : root.documentElement, t = r;
+
+        while (t != root) {
+          if (t.getAttribute("viewBox")) {
+            setCTM(r, t.getCTM());
+
+            t.removeAttribute("viewBox");
+          }
+
+          t = t.parentNode;
+        }
+
+        svgRoot = r;
+      }
+
+      return svgRoot;
+    }
+
+    /**
+    * Instance an SVGPoint object with given event coordinates.
+    */
+    function getEventPoint(evt) {
+      var p = root.createSVGPoint();
+
+      p.x = evt.clientX;
+      p.y = evt.clientY;
+
+      return p;
+    }
+
+    /**
+    * Sets the current transform matrix of an element.
+    */
+    function setCTM(element, matrix) {
+      var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+
+      element.setAttribute("transform", s);
+    }
+
+    /**
+    * Dumps a matrix to a string (useful for debug).
+    */
+    function dumpMatrix(matrix) {
+      var s = "[ " + matrix.a + ", " + matrix.c + ", " + matrix.e + "\n  " + matrix.b + ", " + matrix.d + ", " + matrix.f + "\n  0, 0, 1 ]";
+
+      return s;
+    }
+
+    /**
+    * Sets attributes of an element.
+    */
+    function setAttributes(element, attributes) {
+      for (var i in attributes)
+        element.setAttributeNS(null, i, attributes[i]);
+    }
+
+    /**
+    * Handle mouse wheel event.
+    */
+    function handleMouseWheel(evt) {
+      if (!enableZoom)
+        return;
+
+      if (evt.preventDefault)
+        evt.preventDefault();
+
+      evt.returnValue = false;
+
+      var svgDoc = evt.target.ownerDocument;
+
+      var delta;
+
+      if (evt.wheelDelta)
+        delta = evt.wheelDelta / 360; // Chrome/Safari
+      else
+        delta = evt.detail / -9; // Mozilla
+
+      var z = Math.pow(1 + zoomScale, delta);
+
+      var g = getRoot(svgDoc);
+
+      var p = getEventPoint(evt);
+
+      p = p.matrixTransform(g.getCTM().inverse());
+
+      // Compute new scale matrix in current mouse position
+      var k = root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
+
+      setCTM(g, g.getCTM().multiply(k));
+
+      if (typeof (stateTf) == "undefined")
+        stateTf = g.getCTM().inverse();
+
+      stateTf = stateTf.multiply(k.inverse());
+    }
+
+    /**
+    * Handle mouse move event.
+    */
+    function handleMouseMove(evt) {
+      if (evt.preventDefault)
+        evt.preventDefault();
+
+      evt.returnValue = false;
+
+      var svgDoc = evt.target.ownerDocument;
+
+      var g = getRoot(svgDoc);
+
+      if (state == 'pan' && enablePan) {
+        // Pan mode
+        var p = getEventPoint(evt).matrixTransform(stateTf);
+
+        setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
+      } else if (state == 'drag' && enableDrag) {
+        // Drag mode
+        var p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
+
+        setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
+
+        stateOrigin = p;
+      }
+    }
+
+    /**
+    * Handle click event.
+    */
+    function handleMouseDown(evt) {
+      if (evt.preventDefault)
+        evt.preventDefault();
+
+      evt.returnValue = false;
+
+      var svgDoc = evt.target.ownerDocument;
+
+      var g = getRoot(svgDoc);
+
+      if (
+        evt.target.tagName == "svg"
+        || !enableDrag // Pan anyway when drag is disabled and the user clicked on an element
+      ) {
+        // Pan mode
+        state = 'pan';
+
+        stateTf = g.getCTM().inverse();
+
+        stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
+      } else {
+        // Drag mode
+        state = 'drag';
+
+        stateTarget = evt.target;
+
+        stateTf = g.getCTM().inverse();
+
+        stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
+      }
+    }
+
+    /**
+    * Handle mouse button release event.
+    */
+    function handleMouseUp(evt) {
+      if (evt.preventDefault)
+        evt.preventDefault();
+
+      evt.returnValue = false;
+
+      var svgDoc = evt.target.ownerDocument;
+
+      if (state == 'pan' || state == 'drag') {
+        // Quit pan mode
+        state = '';
+      }
+    }
+
+
+  </script>
+</body>
+
+</html>
+<!--<template>
+<q-page class="flex flex-center">
+  <svg class="layout-svg">
+    <Node v-for="(node, key) in nodes" :key="key" :node="node" />
+    <Edge v-for="(edge) in edges" :key="edge.key" :edge="edge" />
+  </svg>
+</q-page>
+</template>
+
+<script>
+  import { mapState } from "vuex";
+  import watcher from "src/utils/domwatcher";
+  import Node from "src/components/Node.vue";
+  import Edge from "src/components/edge/Edge.vue";
+
+  export default {
+    name: "PageIndex",
+    components: {
+      Node,
+      Edge
+    },
+    mounted() {
+      this.$nextTick(() => {
+        watcher.observe(this.$el);
+      });
+    },
+    computed: {
+      ...mapState(["nodes", "edges"])
+    }
+  };
+</script>
+<style scoped>
+  .layout-svg {
+    background-image: url("../statics/background.png");
+    height: 4000px;
+    width: 100%;
+  }
+</style>
+/**
+* Edge class
+*/
+import { getRandomGuid } from './index'
+export default class EdgeClass {
+constructor (params = {}) {
+this.id = getRandomGuid()
+this.key = getRandomGuid()
+this.fromNodeId = params.fromNodeId
+this.toNodeId = params.toNodeId
+}
+}
+class DomWatcher {
+constructor () {
+this.config = { childList: true, subtree: true }
+this.observer = new MutationObserver((l) => this.handler(l))
+this.subscriptions = {}
+}
+handler (mutationsList) {
+const traverse = (n, f) => {
+if (n.getAttribute) {
+f.call(this, n.getAttribute('id'))
+}
+if (n.hasChildNodes()) {
+n.childNodes.forEach((nn) => traverse(nn, f))
+}
+}
+const notify = (id, event) => {
+if (this.subscriptions[id] && this.subscriptions[id][event]) {
+for (let listenerId in this.subscriptions[id][event]) {
+console.log(`domwatcher notify ${listenerId} ${id} ${event}`)
+this.subscriptions[id][event][listenerId].call(null)
+}
+this.subscriptions[id][event] = {}
+}
+}
+mutationsList.forEach((m) => {
+if (m.type === 'childList') {
+m.addedNodes.forEach((n) => {
+traverse(n, (id) => {
+notify(id, 'added')
+})
+})
+m.removedNodes.forEach((n) => {
+traverse(n, (id) => {
+notify(id, 'added')
+})
+})
+}
+})
+}
+onAdded (listenerId, elementId, callback) {
+this.on(listenerId, elementId, 'added', callback)
+}
+onRemoved (listenerId, elementId, callback) {
+this.on(listenerId, elementId, 'removed', callback)
+}
+on (listenerId, elementId, event, callback) {
+if (!this.subscriptions[elementId]) {
+this.subscriptions[elementId] = {}
+}
+if (!this.subscriptions[elementId][event]) {
+this.subscriptions[elementId][event] = {}
+}
+if (!this.subscriptions[elementId][event][listenerId]) {
+console.log(`domwatcher subscribe ${listenerId} ${elementId} ${event}`)
+this.subscriptions[elementId][event][listenerId] = callback
+}
+}
+observe (targetNode) {
+this.observer.observe(targetNode, this.config)
+}
+}
+
+const watcher = new DomWatcher()
+
+export default watcher
+<template>
+  <g>
+    <path :d="arrow"></path>
+    <path :d="head"></path>
+  </g>
+</template>
+<script>
+  import { mapGetters } from "vuex";
+  import * as utils from "src/utils";
+  import watcher from "src/utils/domwatcher";
+  import Slot from "src/utils/slot";
+  const HEAD_SIZE = 6;
+  const ARC_SIZE = 60;
+
+  export default {
+    props: ["edge"],
+    computed: {
+      ...mapGetters(["getNodeById", "getSuggestById"]),
+      arrow() {
+        return (
+          "M" +
+          this.x1 +
+          " " +
+          this.y1 +
+          " C" +
+          this.x2 +
+          " " +
+          this.y2 +
+          ", " +
+          this.x3 +
+          " " +
+          this.y3 +
+          ", " +
+          this.x4 +
+          " " +
+          this.y4
+        );
+      },
+      head() {
+        if (this.x4 > this.x3) {
+          return (
+            "M" +
+            (this.x4 - HEAD_SIZE) +
+            " " +
+            (this.y4 - HEAD_SIZE) +
+            " L" +
+            this.x4 +
+            " " +
+            this.y4 +
+            " L" +
+            (this.x4 - HEAD_SIZE) +
+            " " +
+            (this.y4 + HEAD_SIZE)
+          );
+        }
+        if (this.x4 < this.x3) {
+          return (
+            "M" +
+            (this.x4 + HEAD_SIZE) +
+            " " +
+            (this.y4 - HEAD_SIZE) +
+            " L" +
+            this.x4 +
+            " " +
+            this.y4 +
+            " L" +
+            (this.x4 + HEAD_SIZE) +
+            " " +
+            (this.y4 + HEAD_SIZE)
+          );
+        }
+        if (this.y4 > this.y3) {
+          return (
+            "M" +
+            (this.x4 - HEAD_SIZE) +
+            " " +
+            (this.y4 - HEAD_SIZE) +
+            " L" +
+            this.x4 +
+            " " +
+            this.y4 +
+            " L" +
+            (this.x4 + HEAD_SIZE) +
+            " " +
+            (this.y4 - HEAD_SIZE)
+          );
+        }
+        if (this.y4 < this.y3) {
+          return (
+            "M" +
+            (this.x4 - HEAD_SIZE) +
+            " " +
+            (this.y4 + HEAD_SIZE) +
+            " L" +
+            this.x4 +
+            " " +
+            this.y4 +
+            " L" +
+            (this.x4 + HEAD_SIZE) +
+            " " +
+            (this.y4 + HEAD_SIZE)
+          );
+        }
+        return null;
+      },
+      slot1() {
+        return this.nearestSlots(
+          this.combine(
+            this.getSlots(this.edge.fromNodeId),
+            this.getSlots(this.edge.toNodeId)
+          )
+        ).slot1;
+      },
+      slot2() {
+        return this.nearestSlots(
+          this.combine(
+            this.getSlots(this.edge.fromNodeId),
+            this.getSlots(this.edge.toNodeId)
+          )
+        ).slot2;
+      },
+      x1() {
+        return this.slot1.x1;
+      },
+      y1() {
+        return this.slot1.y1;
+      },
+      x2() {
+        return this.slot1.x2;
+      },
+      y2() {
+        return this.slot1.y2;
+      },
+      x3() {
+        return this.slot2.x2;
+      },
+      y3() {
+        return this.slot2.y2;
+      },
+      x4() {
+        return this.slot2.x1;
+      },
+      y4() {
+        return this.slot2.y1;
+      }
+    },
+    methods: {
+      nearestSlots(list) {
+        let result = list.map(ll => {
+          return {
+            distance: Math.sqrt(
+              Math.pow(ll[1].x1 - ll[0].x1, 2) + Math.pow(ll[1].y1 - ll[0].y1, 2)
+            ),
+            slot1: ll[0],
+            slot2: ll[1]
+          };
+        });
+        let sorted = result.sort((l, r) => l.distance - r.distance);
+
+        if (sorted.length) {
+          return sorted[0];
+        } else {
+          // заглушка если ничего не нашли
+          return {
+            slot1: { x1: 0, y1: 0, x2: 0, y2: 0 },
+            slot2: { x1: 0, y1: 0, x2: 0, y2: 0 }
+          };
+        }
+      },
+      combine(list1, list2) {
+        let combinations = [];
+        list1.forEach(l1 => {
+          list2.forEach(l2 => {
+            combinations.push([l1, l2]);
+          });
+        });
+        return combinations;
+      },
+      getNodeSlots(node) {
+        if (!document.getElementById(node.id)) {
+          watcher.onAdded(this.edge.id, node.id, () => this.rebuild());
+          return [];
+        }
+        const heightOf = node => {
+          const elem = document.getElementById(node.id);
+          return elem.firstElementChild.firstElementChild.offsetHeight;
+        };
+        const widthOf = node => {
+          const elem = document.getElementById(node.id);
+          return elem.firstElementChild.firstElementChild.offsetWidth;
+        };
+        const nodeWidth = widthOf(node);
+        const nodeHeight = heightOf(node);
+        return [
+          new Slot(
+            node.x + nodeWidth / 2,
+            node.y,
+            node.x + nodeWidth / 2,
+            node.y - ARC_SIZE
+          ),
+          new Slot(
+            node.x + nodeWidth,
+            node.y + nodeHeight / 2,
+            node.x + nodeWidth + ARC_SIZE,
+            node.y + nodeHeight / 2
+          ),
+          new Slot(
+            node.x + nodeWidth / 2,
+            node.y + nodeHeight,
+            node.x + nodeWidth / 2,
+            node.y + nodeHeight + ARC_SIZE
+          ),
+          new Slot(
+            node.x + 0,
+            node.y + nodeHeight / 2,
+            node.x - ARC_SIZE,
+            node.y + nodeHeight / 2
+          )
+        ];
+      },
+      getSuggestSlots(suggest) {
+        if (!document.getElementById(suggest.id)) {
+          watcher.onAdded(this.edge.id, suggest.id, () => this.rebuild());
+          return [];
+        }
+        const node = this.getNodeById(suggest.nodeId);
+        const nodeElement = document.getElementById(suggest.nodeId);
+        const suggestElement = document.getElementById(suggest.id).parentElement
+          .parentElement.parentElement;
+        const nodeRect = nodeElement.getBoundingClientRect();
+        const suggestRect = suggestElement.getBoundingClientRect();
+        const offsetRect = {
+          x: node.x + (suggestRect.x - nodeRect.x),
+          y: node.y + (suggestRect.y - nodeRect.y)
+        };
+        return [
+          new Slot(
+            offsetRect.x,
+            offsetRect.y + suggestRect.height / 2,
+            offsetRect.x - ARC_SIZE,
+            offsetRect.y + suggestRect.height / 2
+          ),
+          new Slot(
+            offsetRect.x + suggestRect.width,
+            offsetRect.y + suggestRect.height / 2,
+            offsetRect.x + suggestRect.width + ARC_SIZE,
+            offsetRect.y + suggestRect.height / 2
+          )
+        ];
+      },
+      getSlots(id) {
+        const node = this.getNodeById(id);
+        if (node) {
+          return this.getNodeSlots(node);
+        }
+
+        const suggest = this.getSuggestById(id);
+        if (suggest) {
+          return this.getSuggestSlots(suggest);
+        }
+
+        return [];
+      },
+      rebuild() {
+        this.edge.key = utils.getRandomGuid();
+      }
+    }
+  };
+</script>
+<style scoped>
+  path {
+    stroke: #a0a8b0;
+    stroke-width: 1px;
+    fill: none;
+  }
+</style>
+-->

@@ -24,9 +24,9 @@ export default {
       );
 
       this.transformManager
-        .onPan((e, t) => {
+        .onViewportChanged((e, t) => {
           this.transform = t;
-          this.$emit("viewportChanged", t);
+          EventBus.$emit("viewportChanged", t);
         })
         .onDrag((e, t) => {
           let p = {

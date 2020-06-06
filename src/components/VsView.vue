@@ -42,8 +42,9 @@ export default {
       Vue.set(this.getNode(nodeId), "transform", transform);
     },
     nodeResized: function({ nodeId, width, height }) {
-      Vue.set(this.getNode(nodeId), "width", width);
-      Vue.set(this.getNode(nodeId), "height", height);
+      let node = this.getNode(nodeId);
+      Vue.set(node, "width", width);
+      Vue.set(node, "height", height);
     }
   },
   components: {
