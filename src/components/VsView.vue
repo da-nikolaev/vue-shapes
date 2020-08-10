@@ -20,7 +20,8 @@ export default {
   data: function() {
     return {
       internalNodes: [],
-      internalEdges: []
+      internalEdges: [],
+      selectedNodes: []
     };
   },
   watch: {
@@ -32,6 +33,8 @@ export default {
     this.$nextTick(() => {
       EventBus.$on("nodeDragged", this.nodeDragged);
       EventBus.$on("nodeResized", this.nodeResized);
+      EventBus.$on("nodeSelected", this.nodeSelected);
+      EventBus.$on("nodeUnselected", this.nodeUnselected);
     });
   },
   methods: {
@@ -45,6 +48,18 @@ export default {
       let node = this.getNode(nodeId);
       Vue.set(node, "width", width);
       Vue.set(node, "height", height);
+    },
+    nodeSelected: function({ nodeId }) {
+      let node = this.getNode(nodeId);
+      this.updateSelectedNodes([node]);
+    },
+    nodeUnselected: function() {
+      this.updateSelectedNodes([]);
+    },
+    updateSelectedNodes: function(nodes) {
+      this.selectedNodes.forEach((node) => Vue.set(node, "selected", false));
+      this.selectedNodes = nodes;
+      this.selectedNodes.forEach((node) => Vue.set(node, "selected", true));
     }
   },
   components: {

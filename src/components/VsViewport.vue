@@ -34,6 +34,15 @@ export default {
             transform: t
           };
           EventBus.$emit("nodeDragged", p);
+        })
+        .onSelect((e) => {
+          let p = {
+            nodeId: e.getAttribute("nodeId")
+          };
+          EventBus.$emit("nodeSelected", p);
+        })
+        .onUnselect(() => {
+          EventBus.$emit("nodeUnselected");
         });
 
       EventBus.$on("zoomIn", () => this.zoomIn());

@@ -29,6 +29,14 @@ export default class VsTransformManager {
     this.onDragHandler = handler
     return this
   }
+  onSelect(handler) {
+    this.onSelectHandler = handler
+    return this
+  }
+  onUnselect(handler) {
+    this.onUnselectHandler = handler
+    return this
+  }
   getEventPoint(evt) {
     let p = this.svg.createSVGPoint();
 
@@ -61,6 +69,9 @@ export default class VsTransformManager {
       this.state.origin = this.getEventPoint(evt).matrixTransform(
         this.state.transform
       );
+      if (typeof this.onUnselectHandler === 'function') {
+        this.onUnselectHandler()
+      }
     } else {
       // Drag mode
       let e = evt.target;
@@ -72,6 +83,9 @@ export default class VsTransformManager {
       this.state.origin = this.getEventPoint(evt).matrixTransform(
         this.state.transform
       );
+      if (typeof this.onSelectHandler === 'function') {
+        this.onSelectHandler(this.state.target)
+      }
     }
   }
   drag(evt) {

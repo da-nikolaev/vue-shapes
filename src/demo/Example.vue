@@ -1,6 +1,6 @@
 <template>
   <VsForeignObject v-bind:data="data">
-    <div class="example">
+    <div class="example" v-bind:class="{ selected: data.selected }">
       <br />
       <div class="row">
         <label>Ответ:</label>
@@ -47,6 +47,9 @@ export default {
   border: 1px solid rgb(192, 197, 207);
   border-radius: 8px;
   font-family: "Courier New", Courier, monospace;
+}
+.example.selected {
+  border-color: #3154f4;
 }
 .row {
   margin-left: 15px;
