@@ -20,6 +20,7 @@ export default class VsTransformManager {
     this.svg.addEventListener("touchleave", e => this.endDrag(e));
     this.svg.addEventListener("touchcancel", e => this.endDrag(e));
     this.svg.addEventListener("wheel", e => this.zoom(e));
+    this.svg.addEventListener("contextmenu", e => this.contextMenu(e));
   }
   onViewportChanged(handler) {
     this.onViewportChangedHandler = handler
@@ -35,6 +36,10 @@ export default class VsTransformManager {
   }
   onUnselect(handler) {
     this.onUnselectHandler = handler
+    return this
+  }
+  onContextMenu(handler) {
+    this.onContextMenuHandler = handler
     return this
   }
   getEventPoint(evt) {
@@ -161,5 +166,16 @@ export default class VsTransformManager {
         .multiply(g.getCTM().inverse())
         .multiply(g.getCTM())
     );
+  }
+  contextMenu(evt) {
+    if (['INPUT'].indexOf(evt.target.tagName) == -1) {
+      if (typeof this.onContextMenuHandler === 'function') {
+        this.onContextMenuHandler(this.state.type == "drag" ? this.state.target : null)
+      }
+      evt.preventDefault()
+    }
+    else {
+      this.endDrag(evt)
+    }
   }
 }

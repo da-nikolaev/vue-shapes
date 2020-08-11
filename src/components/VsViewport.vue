@@ -43,6 +43,17 @@ export default {
         })
         .onUnselect(() => {
           EventBus.$emit("nodeUnselected");
+        })
+        .onContextMenu((e) => {
+          if (e) {
+            let p = {
+              nodeId: e.getAttribute("nodeId")
+            };
+            EventBus.$emit("nodeContextMenu", p);
+          }
+          else {
+            EventBus.$emit("contextMenu");
+          }
         });
 
       EventBus.$on("zoomIn", () => this.zoomIn());

@@ -6,7 +6,7 @@
 <script>
 import Vue from "vue";
 import Example from "./Example";
-import { VsView } from "../VueShapes";
+import { VsView, EventBus } from "../VueShapes";
 
 export default {
   data: function() {
@@ -23,6 +23,8 @@ export default {
         { id: "2", type: "Example", x: 250, y: 310, width: 300, height: 150 }
       ]);
       this.edges = Vue.observable([{ from: "1", to: "2" }]);
+      // EventBus.$on("contextMenu", () => alert('context menu triggered'));
+      // EventBus.$on("nodeContextMenu", ({ nodeId }) => alert(`node ${nodeId} context menu triggered`));
     });
   },
   components: {
